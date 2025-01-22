@@ -68,12 +68,6 @@ DNS options: Opt in Enable DNS Hostnames and Resolution
 
 6. Repeat this step on second public subnet.
 
-## Step 4: Create and Configure Public Route Table
-
-## Step 5: Configure NAT Gateway
-
-## Step 6: Create and Configure Private Route Table
-
 ## Step 7: Create Security Groups
 
 ## Step 8: Launch EC2 Instances
