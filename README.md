@@ -46,13 +46,27 @@ VPC Endpoints: S3 Gateway
 
 DNS options: Opt in Enable DNS Hostnames and Resolution
 
-![image](https://github.com/user-attachments/assets/f88ba4f8-9c3e-46b4-9ff7-4188bea898d3)
+![Image](https://github.com/user-attachments/assets/eee17304-905f-40f6-aced-81cbe1304678)
 
 6. Click "Create VPC".
 
-## Step 2: Create Internet Gateway
+## Step 2: Enable Auto-assign Public IP for Public Subnet
 
-## Step 3: Enable Auto-assign Public IP for Public Subnet
+1. In the VPC Dashboard, navigate to "Subnets"
+2. Select 1 of your public subnets
+
+![Image](https://github.com/user-attachments/assets/66d27411-29bc-407c-986e-195900ef68f8)
+
+3. Click "Actions" and choose "Edit subnet settings"
+
+![Image](https://github.com/user-attachments/assets/02b04b7d-78b6-4465-8f03-63c14ff5c943)
+
+4. Check the box for "Enable auto-assign public IPv4 address"
+5. Click "Save"
+
+![image](https://github.com/user-attachments/assets/e1c3d26d-29d5-44e2-afb2-b2f6062b1976)
+
+6. Repeat this step on second public subnet.
 
 ## Step 4: Create and Configure Public Route Table
 
