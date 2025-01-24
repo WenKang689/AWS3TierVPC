@@ -68,7 +68,70 @@ DNS options: Opt in Enable DNS Hostnames and Resolution
 
 6. Repeat this step on second public subnet.
 
-## Step 7: Create Security Groups
+## Step 3: Create Security Groups
+
+1. In the VPC dashboard, navigate to "Security Groups"
+2. Click "Create security group"
+
+![image](https://github.com/user-attachments/assets/2c16eba1-792c-40d3-b7f8-ec3c26f2f722)
+
+3. Create the following security groups:
+
+a. Web Tier Security Group:
+
+Name: Web-SG
+
+Description: Allow HTTP/HTTPS from anywhere
+
+VPC: Select your VPC
+
+Inbound rules:
+
+Allow HTTP (80) from anywhere
+
+Allow HTTPS (443) from anywhere
+
+Outbound rules: Allow all traffic
+
+![image](https://github.com/user-attachments/assets/56eef424-5986-4471-a26f-26d151c8771b)
+
+
+b. Application Tier Security Group:
+
+Name: App-SG
+
+Description: Allow traffic from Web tier
+
+VPC: Select your VPC
+
+Inbound rules:
+
+Allow custom TCP (e.g., 8080) from Web-SG
+
+Outbound rules: Allow all traffic
+
+![image](https://github.com/user-attachments/assets/a13bbfc6-1070-474a-a298-c429d31e9ab8)
+
+
+c. Database Tier Security Group:
+
+Name: DB-SG
+
+Description: Allow traffic from App tier
+
+VPC: Select your VPC
+
+Inbound rules:
+
+Allow MySQL/Aurora (3306) from App-SG
+
+Outbound rules: Allow all traffic
+
+
+![image](https://github.com/user-attachments/assets/d2be57f5-a772-40b5-888d-5863352e2151)
+
+
+4. Click "Create security group" for each.
 
 ## Step 8: Launch EC2 Instances
 
