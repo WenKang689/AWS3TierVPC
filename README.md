@@ -140,3 +140,22 @@ Outbound rules: Allow all traffic
 ## Step 10: Set up RDS
 
 ## Step 11: Configure Auto Scaling Group
+
+
+# Testing 3-Tier VPC
+
+This is a step-by-step guide to test the 3-Tier VPC involves validating the functionality and connectivity of all the components.
+
+## Step 1: Verify Public Subnet and Internet Accessibility
+
+## Step 2: Verify Private Subnet Accessibility
+
+## Step 3: Testing Application Load Balancer (ALB)
+
+## Step 4: Testing Security Groups and Network ACLs
+
+## Step 5: Validating RDS Connectivity
+
+## Step 6: Verifying Auto Scaling Group
+
+## Step 7: Testing Monitoring and Logging
