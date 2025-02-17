@@ -91,7 +91,9 @@ Allow HTTP (80) from anywhere
 
 Allow HTTPS (443) from anywhere
 
-Outbound rules: Allow all traffic
+Outbound rules:
+
+Allow all traffic
 
 ![image](https://github.com/user-attachments/assets/56eef424-5986-4471-a26f-26d151c8771b)
 
@@ -108,7 +110,9 @@ Inbound rules:
 
 Allow custom TCP (e.g., 8080) from Web-SG
 
-Outbound rules: Allow all traffic
+Outbound rules:
+
+Allow all traffic
 
 ![image](https://github.com/user-attachments/assets/a13bbfc6-1070-474a-a298-c429d31e9ab8)
 
@@ -125,7 +129,9 @@ Inbound rules:
 
 Allow MySQL/Aurora (3306) from App-SG
 
-Outbound rules: Allow all traffic
+Outbound rules:
+
+Allow all traffic
 
 
 ![image](https://github.com/user-attachments/assets/d2be57f5-a772-40b5-888d-5863352e2151)
@@ -133,13 +139,181 @@ Outbound rules: Allow all traffic
 
 4. Click "Create security group" for each.
 
-## Step 8: Launch EC2 Instances
+## Step 4: Add an Appliction Load Balancer
 
-## Step 9: Add an Appliction Load Balancer
+Adding an Application Load Balancer (ALB) distributes incoming application traffic across multiple targets, such as EC2 instances, in multiple Availability Zones. This improves the application's fault tolerance.
 
-## Step 10: Set up RDS
+1. Navigate to the EC2 dashboard and select "Load Balancers"
 
-## Step 11: Configure Auto Scaling Group
+![image](https://github.com/user-attachments/assets/752f850b-4253-4869-a252-bac32d16f036)
+
+2. Click "Create Load Balancer" and choose "Application Load Balancer"
+
+![image](https://github.com/user-attachments/assets/0c25f8e1-90ea-4993-bb09-fe318abc3bb0)
+
+![image](https://github.com/user-attachments/assets/b401cb60-999b-4079-8d40-dc861c2e0149)
+
+3. Basic Configurations
+
+Load Balancer Name: ALB
+
+Scheme: Internet-facing
+
+IP Address Type: IPv4
+
+![image](https://github.com/user-attachments/assets/24cd7963-d363-48cb-ad98-7408d960a250)
+
+4. Network Mapping
+
+Select your VPC, and select at least two public subnets from different AZs
+
+![image](https://github.com/user-attachments/assets/f9b4c5f8-9223-4560-89c8-ba119c8aa931)
+
+5. Security Groups
+
+Create a new security group for the ALB:
+
+Name: ALB-SG
+
+Description: Allow HTTP and HTTPS from anywhere
+
+Inbound rules: Allow HTTP (80) and HTTPS (443) from anywhere
+
+Outbound rules: Allow all traffic
+
+![image](https://github.com/user-attachments/assets/ccbfb583-2b19-4a48-a866-0bca91702fba)
+
+![image](https://github.com/user-attachments/assets/c7e2d0f4-cd7a-45c7-a23d-46aa198f12a7)
+
+Click "Create Security Group", and select the security group at ALB page.
+
+6. Listeners and Routing
+
+Protocol: HTTP
+
+Port: 80
+
+Click "Create Target Group".
+
+![image](https://github.com/user-attachments/assets/cd43c062-d0f7-49c1-8022-1b5748fafeb4)
+
+Create a target group:
+
+Target Type: Instances
+
+Name: TG
+
+Protocol: HTTP
+
+Port: 80
+
+![image](https://github.com/user-attachments/assets/b9d950a4-005e-4f89-8fc9-4521d66e0a7c)
+
+Select your VPC and configure health checks as needed. Click Next.
+
+![image](https://github.com/user-attachments/assets/a35dcee4-dbad-4b5d-9778-d7d28a4558ff)
+
+Skip register targets. Click "Create Target Group".
+
+![image](https://github.com/user-attachments/assets/0081fb3d-1e80-43c0-9600-25a17fe89291)
+
+7. Navigate back to Create ALB page. Refresh and select the TG created.
+
+![image](https://github.com/user-attachments/assets/b9e688cd-6607-4410-b06f-d2ac6c05520c)
+
+8. Click "Create Load Balancer".
+
+## Step 5: Configure Auto Scaling Group
+
+1. Navigate to the EC2 dashboard and select "Auto Scaling Groups". Click "Create Auto Scaling Group".
+
+![image](https://github.com/user-attachments/assets/6470e9ca-3cf4-43c6-9835-d0dd6002f8eb)
+
+2. Enter the auto scaling group name and click "Create a Launch Template".
+
+![image](https://github.com/user-attachments/assets/7f6b8408-3358-4600-ac1b-fa125b7b8528)
+
+3. Enter the template name and description.
+
+![image](https://github.com/user-attachments/assets/392e7ab3-7e2a-4247-afdc-b60d5d9f4703)
+
+AMI: Amazon Linux 2023 AMI
+
+![image](https://github.com/user-attachments/assets/e2b821d5-a0eb-4142-9975-2b145110d3e4)
+
+5. Instance Type: t3.micro. Create a new key pair.
+
+Name: Web-EC2-KP
+
+Key Pair Type: RSA
+
+Private Key File Format: .pem
+
+Click "Create key pair".
+
+![image](https://github.com/user-attachments/assets/5b590fbf-fa8f-4c8b-a1ff-88066ce16e96)
+
+6. Select the key pair created.
+
+Subnet: Do not include in launch template
+
+Security Groups: App-SG
+
+7. Click "Create Launch Template".
+
+![image](https://github.com/user-attachments/assets/a88bb438-d9e4-4200-9797-ac80ea973fca)
+
+8. Navigate back to create auto scaling group page. Refresh and select the launch template created. Click next.
+
+![image](https://github.com/user-attachments/assets/b746175e-dc67-474a-8e91-1e7877af0cf5)
+
+9. Select your VPC. Select a private subnet that represents app tier in each availability zone. Click next.
+
+![image](https://github.com/user-attachments/assets/68a7f2b4-bdb3-4c0d-bff3-8548c0a305a2)
+
+10. Select "Attach to an existing load balancer". Select "Choose from application or network load balancer target groups". Select the target group.
+
+![image](https://github.com/user-attachments/assets/1f71453a-81e1-4089-9e58-614e57966fab)
+
+11. Turn on Elastic Load Balancing Health Checks and click next.
+
+![image](https://github.com/user-attachments/assets/5d482160-fe34-498f-9f18-b3363287ece3)
+
+12. Adjust the scaling policy.
+
+![image](https://github.com/user-attachments/assets/c466292f-474d-453e-8c65-9947cf96217e)
+
+13. Enable group metrics collection within CloudWatch and click next.
+
+![image](https://github.com/user-attachments/assets/c04b84c1-2bff-46d5-a579-d8f1c6c9c353)
+
+14. Click "Create Auto Scaling Group".
+
+![image](https://github.com/user-attachments/assets/ce291e77-52e6-4a4a-b95a-ff6c3e7a46c3)
+
+## Step 6: Set up RDS
+
+1. Navigate to RDS Dashboard. Select "Databases" and click "Create Database".
+
+![image](https://github.com/user-attachments/assets/c198defc-1c6f-4a3f-b89f-c78d2ca49c5d)
+
+2. Select "Easy Create". Select MySQL database and MySQL Community Edition.
+
+![image](https://github.com/user-attachments/assets/3bb56a00-4af6-4623-a947-622f2a89f87e)
+
+DB Instance Size: Free Tier
+
+DB Instance Identifier: DB-3TVPC
+
+Master Username: WK
+
+Opt-in Auto Generate Password. Click create database.
+
+![image](https://github.com/user-attachments/assets/d3ffa431-4770-4eab-bc71-d4516f1247b3)
+
+3. While waiting the database creation, click "View Credential Details" above to view your master password.
+
+![image](https://github.com/user-attachments/assets/f80f57ca-c6c9-4244-85b8-e9e3760ce70c)
 
 
 # Testing 3-Tier VPC
