@@ -108,13 +108,13 @@ VPC: Select your VPC
 
 Inbound rules:
 
-Allow custom TCP (e.g., 8080) from Web-SG
+Allow SSH from Web-SG
 
 Outbound rules:
 
 Allow all traffic
 
-![image](https://github.com/user-attachments/assets/a13bbfc6-1070-474a-a298-c429d31e9ab8)
+![image](https://github.com/user-attachments/assets/eb37147a-0879-4320-8190-9ce2afce4607)
 
 
 c. Database Tier Security Group:
@@ -223,6 +223,17 @@ Skip register targets. Click "Create Target Group".
 
 8. Click "Create Load Balancer".
 
+9. After creating Application Load Balancer, we need to edit the APP-SG security group to allow traffic from Application Load Balancer.
+
+10. Navigate to EC2 dashboard. Select security group and click App-SG.
+
+![image](https://github.com/user-attachments/assets/e316e433-c8db-4dc2-8f60-a602f8b88159)
+
+11. Add a new rule, allowing HTTP from ALB security group. Click "Save Rules".
+
+![image](https://github.com/user-attachments/assets/23980cdf-6722-4879-a511-4f334041ecf8)
+
+
 ## Step 5: Configure Auto Scaling Group
 
 1. Navigate to the EC2 dashboard and select "Auto Scaling Groups". Click "Create Auto Scaling Group".
@@ -243,6 +254,8 @@ AMI: Amazon Linux 2023 AMI
 
 5. Instance Type: t3.micro. Create a new key pair.
 
+![image](https://github.com/user-attachments/assets/5b590fbf-fa8f-4c8b-a1ff-88066ce16e96)
+
 Name: Web-EC2-KP
 
 Key Pair Type: RSA
@@ -251,7 +264,7 @@ Private Key File Format: .pem
 
 Click "Create key pair".
 
-![image](https://github.com/user-attachments/assets/5b590fbf-fa8f-4c8b-a1ff-88066ce16e96)
+![image](https://github.com/user-attachments/assets/d671e8a6-b796-4423-a473-31f5485e59b7)
 
 6. Select the key pair created.
 
@@ -259,35 +272,57 @@ Subnet: Do not include in launch template
 
 Security Groups: App-SG
 
-7. Click "Create Launch Template".
+![image](https://github.com/user-attachments/assets/72bb3481-6346-42dc-83d6-d2bccd1f798c)
 
-![image](https://github.com/user-attachments/assets/a88bb438-d9e4-4200-9797-ac80ea973fca)
+7. Expand Advanced Details and paste the following user data:
 
-8. Navigate back to create auto scaling group page. Refresh and select the launch template created. Click next.
+```Bash
+#!/bin/bash
+# Update the system
+yum update -y
+
+# Install Apache (httpd)
+yum install -y httpd
+
+# Start the Apache service
+systemctl start httpd
+
+# Enable Apache to start on boot
+systemctl enable httpd
+
+# Create a simple health check page with the AZ variable
+echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+```
+
+![image](https://github.com/user-attachments/assets/e92b7a6b-d862-4029-adc9-eae0e61fc17e)
+
+8. Click "Create Launch Template".
+
+9. Navigate back to create auto scaling group page. Refresh and select the launch template created. Click next.
 
 ![image](https://github.com/user-attachments/assets/b746175e-dc67-474a-8e91-1e7877af0cf5)
 
-9. Select your VPC. Select a private subnet that represents app tier in each availability zone. Click next.
+10. Select your VPC. Select a private subnet that represents app tier in each availability zone. Click next.
 
 ![image](https://github.com/user-attachments/assets/68a7f2b4-bdb3-4c0d-bff3-8548c0a305a2)
 
-10. Select "Attach to an existing load balancer". Select "Choose from application or network load balancer target groups". Select the target group.
+11. Select "Attach to an existing load balancer". Select "Choose from application or network load balancer target groups". Select the target group.
 
 ![image](https://github.com/user-attachments/assets/1f71453a-81e1-4089-9e58-614e57966fab)
 
-11. Turn on Elastic Load Balancing Health Checks and click next.
+12. Turn on Elastic Load Balancing Health Checks and click next.
 
 ![image](https://github.com/user-attachments/assets/5d482160-fe34-498f-9f18-b3363287ece3)
 
-12. Adjust the scaling policy.
+13. Adjust the scaling policy.
 
 ![image](https://github.com/user-attachments/assets/c466292f-474d-453e-8c65-9947cf96217e)
 
-13. Enable group metrics collection within CloudWatch and click next.
+14. Enable group metrics collection within CloudWatch and click next.
 
 ![image](https://github.com/user-attachments/assets/c04b84c1-2bff-46d5-a579-d8f1c6c9c353)
 
-14. Click "Create Auto Scaling Group".
+15. Click "Create Auto Scaling Group".
 
 ![image](https://github.com/user-attachments/assets/ce291e77-52e6-4a4a-b95a-ff6c3e7a46c3)
 
@@ -315,12 +350,33 @@ Opt-in Auto Generate Password. Click create database.
 
 ![image](https://github.com/user-attachments/assets/f80f57ca-c6c9-4244-85b8-e9e3760ce70c)
 
+## Step 7: Update Security Group
+
+Since EC2 Instances will receive traffic from Application Load Balancer, we need to modify security group for EC2 Instances created in private subnet.
+
+1. Navigate to EC2 Instance dashboard and select Security Groups. Select App-SG and click "Edit inbound rules"
+
+![image](https://github.com/user-attachments/assets/27acc1eb-1016-4cd7-aecd-b3775aa28b16)
+
+2. Change the source to ALB-SG to allow traffic from Application Load Balancer. Click "Save Rules".
+
+![image](https://github.com/user-attachments/assets/66fc1d4c-fa0c-4d93-94ee-a77e54790f7e)
+
 
 # Testing 3-Tier VPC
 
 This is a step-by-step guide to test the 3-Tier VPC involves validating the functionality and connectivity of all the components.
 
 ## Step 1: Verify Public Subnet and Internet Accessibility
+
+1. Navigate to EC2 dashboard and select Instances. Select the instance in first public subnet and click "Connect".
+
+![image](https://github.com/user-attachments/assets/fa0f275e-17a0-4ace-862b-ad3bf6f9f109)
+
+2. 
+
+
+
 
 ## Step 2: Verify Private Subnet Accessibility
 
