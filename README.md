@@ -1,6 +1,6 @@
 # AWS 3-Tier VPC
 
-This is a hands on project creating a 3-Tier Virtual Privare Cloud(VPC) in Amazon Web Services(AWS) using AWS Management Console.
+This is a hands on project creating a 3-Tier Virtual Private Cloud(VPC) in Amazon Web Services(AWS) using AWS Management Console.
 
 # Architecture Overview
 
