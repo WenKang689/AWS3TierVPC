@@ -225,7 +225,7 @@ Skip register targets. Click "Create Target Group".
 
 9. After creating Application Load Balancer, we need to edit the APP-SG security group to allow traffic from Application Load Balancer.
 
-10. Navigate to EC2 dashboard. Select security group and click App-SG.
+10. Navigate to EC2 dashboard. Select security group and select App-SG. Click "Edit Inbound Rules".
 
 ![image](https://github.com/user-attachments/assets/e316e433-c8db-4dc2-8f60-a602f8b88159)
 
@@ -332,9 +332,9 @@ echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
 ![image](https://github.com/user-attachments/assets/c198defc-1c6f-4a3f-b89f-c78d2ca49c5d)
 
-2. Select "Easy Create". Select MySQL database and MySQL Community Edition.
+2. Select "Standard Create". Select MySQL database and MySQL Community Edition.
 
-![image](https://github.com/user-attachments/assets/3bb56a00-4af6-4623-a947-622f2a89f87e)
+![image](https://github.com/user-attachments/assets/eb85caaa-18c7-422f-bbbf-4198fbaf16eb)
 
 DB Instance Size: Free Tier
 
@@ -342,13 +342,23 @@ DB Instance Identifier: DB-3TVPC
 
 Master Username: WK
 
-Opt-in Auto Generate Password. Click create database.
+Opt-in Auto Generate Password.
 
-![image](https://github.com/user-attachments/assets/d3ffa431-4770-4eab-bc71-d4516f1247b3)
+![image](https://github.com/user-attachments/assets/97973e22-a7ee-4644-96a4-0da1869b6883)
 
-3. While waiting the database creation, click "View Credential Details" above to view your master password.
+3. Select your VPC, and select DB-SG as security group. Click "Create Database".
+
+![image](https://github.com/user-attachments/assets/9db46468-9300-40d3-8fc6-37afba5f1bb8)
+
+4. While waiting the database creation, click "View Credential Details" above to view and copy your master password.
 
 ![image](https://github.com/user-attachments/assets/f80f57ca-c6c9-4244-85b8-e9e3760ce70c)
+
+4. After the RDS created, select the subnet groups. Select the subnet group created. Click "Edit".
+
+![image](https://github.com/user-attachments/assets/22105495-3cc9-4637-8aad-fac652a2f968)
+
+5. Only select the private subnet for database. Click "Save".
 
 ## Step 7: Update Security Group
 
@@ -362,6 +372,30 @@ Since EC2 Instances will receive traffic from Application Load Balancer, we need
 
 ![image](https://github.com/user-attachments/assets/66fc1d4c-fa0c-4d93-94ee-a77e54790f7e)
 
+## Step 8: Create Bastion Host
+
+We need a bastion host in order to SSH into EC2 instances in private subnet for testing later.
+
+1. Navigate to EC2 dashboard, Select "Instances" and click "Launch Instances".
+
+![image](https://github.com/user-attachments/assets/72cbe7c3-41b2-4d2c-9ac4-bc3d13a05d02)
+
+2. Name the instance as Bastion and select Amazon Linux 2023 AMI
+
+![image](https://github.com/user-attachments/assets/c23301bd-ae3d-4f13-92f2-5eb499a48378)
+
+Instance Type: t3.micro
+
+Key Pair: Web-EC2-KP
+
+![image](https://github.com/user-attachments/assets/90af419c-0e43-4c7b-83d3-7fbe05b12191)
+
+3. Select you VPC, any public subnet, and Web-SG security group.
+
+![image](https://github.com/user-attachments/assets/5f6bdebb-d5f6-4347-893d-e36a335e4530)
+
+4. Launch the instance.
+
 
 # Testing 3-Tier VPC
 
@@ -369,23 +403,133 @@ This is a step-by-step guide to test the 3-Tier VPC involves validating the func
 
 ## Step 1: Verify Public Subnet and Internet Accessibility
 
-1. Navigate to EC2 dashboard and select Instances. Select the instance in first public subnet and click "Connect".
+1. Open command prompt. Change directory to where key pair downloaded.
 
-![image](https://github.com/user-attachments/assets/fa0f275e-17a0-4ace-862b-ad3bf6f9f109)
+![image](https://github.com/user-attachments/assets/406cb927-1384-4571-8df0-a5a4df916297)
 
-2. 
+2. SSH into bastion host in public subnet. Change the <public ip address of bastion host> according to your instance.
 
+```
+ssh -i Web-EC2-KP.pem ec2-user@<public ip address of bastion host>
+```
 
+![image](https://github.com/user-attachments/assets/ba69780f-1632-47e1-9c8a-59445f36fc0b)
+
+5. Try to ping any website to ensure Internet Connectivity.
+
+```
+ping google.com
+```
+
+![image](https://github.com/user-attachments/assets/1bd0d92a-6712-4d32-ab79-abaaa3a999e9)
+
+6. Press CTRL+C to pause the ping.
 
 
 ## Step 2: Verify Private Subnet Accessibility
 
+1. Open command prompt. Change directory to where key pair downloaded.
+
+![image](https://github.com/user-attachments/assets/406cb927-1384-4571-8df0-a5a4df916297)
+
+2. Add the key pair of private EC2 instance.
+
+```
+ssh-add App-EC2-KP.pem
+```
+
+![image](https://github.com/user-attachments/assets/e9da618f-b2c2-44e0-a574-6f11661cbbea)
+
+3. SSH into bastion host in public subnet with agent forwarding. Change the <public ip address of bastion host> according to your instance.
+
+```
+ssh -A -i Web-EC2-KP.pem ec2-user@<public ip address of bastion host>
+```
+
+![image](https://github.com/user-attachments/assets/e5117467-0e12-46c9-b0a4-24d3ffb5a17f)
+
+4. SSH into EC2 instance in private subnet.Change the <private ip address of private EC2 instance> according to your instance.
+
+```
+ssh ec2-user@<private ip address of private EC2 instance>
+```
+
+![image](https://github.com/user-attachments/assets/902c3d2a-c1cf-41f6-a22b-5c9b870ceb96)
+
+5. Try to ping any website to ensure Internet Connectivity.
+
+```
+ping google.com
+```
+
 ## Step 3: Testing Application Load Balancer (ALB)
 
-## Step 4: Testing Security Groups and Network ACLs
+1. Navigate to EC2 dashboard. Select Load Balancers. Copy the DNS Name of the Application Load Balancer.
 
-## Step 5: Validating RDS Connectivity
+![image](https://github.com/user-attachments/assets/8a2eb020-159c-4b64-9cee-61f6d598582d)
 
-## Step 6: Verifying Auto Scaling Group
+2. Open a new tab and paste the URL. Press enter, and you will see the same page if Application Load Balancer successfully to send traffic to your private EC2 instances.
 
-## Step 7: Testing Monitoring and Logging
+![image](https://github.com/user-attachments/assets/dc9d0cc1-e5cd-4e93-ace1-0f2743e38c87)
+
+3. Refresh the page. The IP address shown in the page should be change, which means that the Application Load Balancer is working.
+
+![image](https://github.com/user-attachments/assets/5141407e-a446-4786-ab90-a242f27e2d31)
+
+## Step 4: Validating RDS Connectivity
+
+1. Before that, we need to install mysql client in private EC2 instance. Firstly, open command prompt and ssh into private EC2 instance as the step above.
+
+2. Next, run the following command. Replace <Username> with your master username.
+
+```
+sudo dnf install https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm -y
+
+sudo dnf makecache
+
+sudo dnf install mysql-community-server -y
+
+sudo systemctl enable mysqld --now
+
+mysql -h db-3tvpc.c5mme2eiedw7.ap-southeast-5.rds.amazonaws.com -P 3306 -u <Username> -p
+
+```
+
+3. Enter the password you copied before.
+
+![image](https://github.com/user-attachments/assets/f2cd932b-b0ea-45b5-bfaf-8dc67581b8ec)
+
+![image](https://github.com/user-attachments/assets/a840580d-4be8-4252-bd88-977f05bc88e5)
+
+![image](https://github.com/user-attachments/assets/5c27ea0c-62fc-45c5-a362-d9875fa978d5)
+
+4. Try some sql queries here.
+
+```
+SHOW DATABASES;
+```
+
+![image](https://github.com/user-attachments/assets/c9731798-4638-410c-880f-0d1a04c9c4c9)
+
+
+## Step 5: Verifying Auto Scaling Group
+
+1. Open command prompt and ssh into private EC2 instance as the step above.
+
+2. Run the following command. Replace <ALB-DNS-Name> with your ALB DNS name.
+
+```
+ab -n 1000000 -c 10000 http://<ALB-DNS-Name>/
+```
+
+![image](https://github.com/user-attachments/assets/96dbf696-b294-471e-8355-3c9ea9a29390)
+
+2. Navigate to EC2 Dashboard. Select Auto Scaling Groups and choose your auto scaling group.
+
+![image](https://github.com/user-attachments/assets/c8bd27ed-4d72-4c02-94c1-8bd40a600b8b)
+
+3. Click "Activity" tab. Monitor the auto scaling tab until it launching new instances.
+
+![image](https://github.com/user-attachments/assets/6e6add6e-f28e-4c70-920d-09bc854714ae)
+
+4. If ASG not scaling out, try to run the command few more times until the ASG scales out.
