@@ -11,10 +11,15 @@ This is an overview diagram showing the 3-Tier VPC Architecture.
 This diagram shows the key components of the architecture, including:
 
 Public and Private subnets across two Availability Zones
+
 Internet Gateway for public internet access
+
 NAT Gateways for outbound internet access from private subnets
+
 Application Load Balancer in the public subnets
+
 EC2 instances in each tier
+
 RDS instance in the private subnet
 
 # Building 3-Tier VPC in AWS Step-by-step 
