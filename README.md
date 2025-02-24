@@ -412,7 +412,7 @@ This is a step-by-step guide to test the 3-Tier VPC involves validating the func
 
 ![image](https://github.com/user-attachments/assets/406cb927-1384-4571-8df0-a5a4df916297)
 
-2. SSH into bastion host in public subnet. Change the <public ip address of bastion host> according to your instance.
+2. SSH into bastion host in public subnet. Change the "public ip address of bastion host" according to your instance.
 
 ```
 ssh -i Web-EC2-KP.pem ec2-user@<public ip address of bastion host>
@@ -445,7 +445,7 @@ ssh-add App-EC2-KP.pem
 
 ![image](https://github.com/user-attachments/assets/e9da618f-b2c2-44e0-a574-6f11661cbbea)
 
-3. SSH into bastion host in public subnet with agent forwarding. Change the <public ip address of bastion host> according to your instance.
+3. SSH into bastion host in public subnet with agent forwarding. Change the "public ip address of bastion host" according to your instance.
 
 ```
 ssh -A -i Web-EC2-KP.pem ec2-user@<public ip address of bastion host>
@@ -453,7 +453,7 @@ ssh -A -i Web-EC2-KP.pem ec2-user@<public ip address of bastion host>
 
 ![image](https://github.com/user-attachments/assets/e5117467-0e12-46c9-b0a4-24d3ffb5a17f)
 
-4. SSH into EC2 instance in private subnet.Change the <private ip address of private EC2 instance> according to your instance.
+4. SSH into EC2 instance in private subnet. Change the "private ip address of private EC2 instance" according to your instance.
 
 ```
 ssh ec2-user@<private ip address of private EC2 instance>
@@ -485,7 +485,7 @@ ping google.com
 
 1. Before that, we need to install mysql client in private EC2 instance. Firstly, open command prompt and ssh into private EC2 instance as the step above.
 
-2. Next, run the following command. Replace <Username> with your master username.
+2. Next, run the following command. Replace "username" with your master username.
 
 ```
 sudo dnf install https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm -y
@@ -521,7 +521,7 @@ SHOW DATABASES;
 
 1. Open command prompt and ssh into private EC2 instance as the step above.
 
-2. Run the following command. Replace <ALB-DNS-Name> with your ALB DNS name.
+2. Run the following command. Replace "ALB-DNS-Name" with your ALB DNS name.
 
 ```
 ab -n 1000000 -c 10000 http://<ALB-DNS-Name>/
